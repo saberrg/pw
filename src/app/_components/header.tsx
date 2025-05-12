@@ -3,7 +3,7 @@ import { ThemeSwitcher } from "./theme-switcher";
 
 const Header = () => {
   return (
-    <header className="w-full border-b border-gray-200 dark:border-gray-700">
+    <header className="w-full border-b border-gray-200 dark:border-gray-700 mb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           {/* Site Name and Subtitle */}
