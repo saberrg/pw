@@ -8,9 +8,9 @@ type Props = {
 export function PostList({ posts }: Props) {
   return (
     <section>
-      <h2 className="mb-8 text-4xl font-bold tracking-tighter leading-tight">
+      {/* <h2 className="mb-8 text-4xl font-bold tracking-tighter leading-tight">
         Latest Posts
-      </h2>
+      </h2> */}
       <div className="space-y-8">
         {posts.map((post) => (
           <PostPreview
