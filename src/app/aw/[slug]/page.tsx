@@ -45,11 +45,11 @@ const awItems: AWItem[] = [
 ];
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 };
 
 export default async function AWDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug } = params;
   const item = awItems.find(
     (i) => i.title.toLowerCase().replace(/\s+/g, '-') === slug
   );
@@ -95,7 +95,7 @@ export default async function AWDetailPage({ params }: Props) {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { slug } = await params;
+  const { slug } = params;
   const item = awItems.find(
     (i) => i.title.toLowerCase().replace(/\s+/g, '-') === slug
   );
