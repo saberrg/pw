@@ -44,19 +44,19 @@ const awItems: AWItem[] = [
   // Add more items here
 ];
 
-interface Props {
+type Props = {
   params: {
     slug: string;
   };
-}
+};
 
-export default function AWDetailPage({ params }: Props) {
+export default async function AWDetailPage({ params }: Props) {
   const item = awItems.find(
     (i) => i.title.toLowerCase().replace(/\s+/g, '-') === params.slug
   );
 
   if (!item) {
-    notFound();
+    return notFound();
   }
 
   return (
@@ -93,4 +93,29 @@ export default function AWDetailPage({ params }: Props) {
       </article>
     </div>
   );
+}
+
+export async function generateMetadata({ params }: Props) {
+  const item = awItems.find(
+    (i) => i.title.toLowerCase().replace(/\s+/g, '-') === params.slug
+  );
+
+  if (!item) {
+    return notFound();
+  }
+
+  return {
+    title: item.title,
+    description: item.description,
+    openGraph: {
+      title: item.title,
+      description: item.description,
+    },
+  };
+}
+
+export async function generateStaticParams() {
+  return awItems.map((item) => ({
+    slug: item.title.toLowerCase().replace(/\s+/g, '-')
+  }));
 }
