@@ -4,7 +4,7 @@ excerpt: "Talking about experience using Wordpress when making websites for clie
 coverImage: "/assets/blog/hello-world/cover.jpg"
 date: "2020-03-16T05:35:07.322Z"
 author:
-  name: Tim Neutkens
+  name: Saber
   picture: "/assets/blog/authors/Saber-G.jpg"
 ogImage:
   url: "/assets/blog/hello-world/cover.jpg"
