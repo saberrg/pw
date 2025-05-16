@@ -10,13 +10,12 @@ import { PostBody } from "@/app/_components/posts/post-body";
 import { PostHeader } from "@/app/_components/posts/post-header";
 
 type Props = {
-  params: {
-    slug: string;
-  };
+  params: Promise<{ slug: string }>;
 };
 
 export default async function Post({ params }: Props) {
-  const post = getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
     return notFound();
@@ -42,7 +41,8 @@ export default async function Post({ params }: Props) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
     return notFound();
