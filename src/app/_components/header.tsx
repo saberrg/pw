@@ -9,10 +9,10 @@ const Header = () => {
           {/* Site Name and Subtitle */}
           <div className="flex flex-col">
             <Link href="/" className="text-2xl font-bold hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-              In God We Trust
+              My Personal Website
             </Link>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              My Personal Website
+              Gloria in Excelsis Deo
             </p>
           </div>
 
