@@ -49,7 +49,8 @@ type Props = {
 };
 
 export default async function AWDetailPage({ params }: Props) {
-  const { slug } = params;
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
   const item = awItems.find(
     (i) => i.title.toLowerCase().replace(/\s+/g, '-') === slug
   );
@@ -95,7 +96,8 @@ export default async function AWDetailPage({ params }: Props) {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { slug } = params;
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
   const item = awItems.find(
     (i) => i.title.toLowerCase().replace(/\s+/g, '-') === slug
   );

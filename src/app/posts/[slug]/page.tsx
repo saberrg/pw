@@ -14,7 +14,8 @@ type Props = {
 };
 
 export default async function Post({ params }: Props) {
-  const { slug } = params;
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
   const post = getPostBySlug(slug);
 
   if (!post) {
@@ -41,7 +42,8 @@ export default async function Post({ params }: Props) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = params;
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
   const post = getPostBySlug(slug);
 
   if (!post) {
