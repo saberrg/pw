@@ -1,4 +1,5 @@
 "use client";
+import { Post } from "@/interfaces/post";
 import { ReactNode } from "react";
 import Link from "next/link";
 
@@ -10,7 +11,7 @@ interface AWItem {
 }
 
 interface AWListProps {
-  items: AWItem[];
+  items: Post[];
   title?: string;
 }
 
@@ -36,25 +37,30 @@ export function AWList({ items, title }: AWListProps) {
     <div className="space-y-8">
       {title && <h2 className="text-2xl font-bold mb-6">{title}</h2>}
       <div className="space-y-6">
-        {items.map((item, index) => (
-          <Link
-            key={index}
-            href={item.link || "#"}
-            className="block border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-center gap-4">
-              {getIcon(item.type)}
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2 flex items-center">
-                  {item.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-0">
-                  {item.description}
-                </p>
+        {items.map((post) => {
+          // Determine if the post is audio or writing based on tags
+          const type = post.tags?.includes('audio') ? 'audio' : 'writing';
+          
+          return (
+            <Link
+              key={post.slug}
+              href={`/posts/${post.slug}`}
+              className="block border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                {getIcon(type)}
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-2 flex items-center">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-0">
+                    {post.excerpt}
+                  </p>
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

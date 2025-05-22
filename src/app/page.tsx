@@ -5,7 +5,7 @@ import { getAllPosts } from "@/lib/api";
 
 export default function Index() {
   const allPosts = getAllPosts();
-
+  console.log(allPosts);
   return (
     <main>
       <Container>
