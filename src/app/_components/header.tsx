@@ -6,6 +6,7 @@ const Header = () => {
   const navigationItems = [
     { label: "Travel", href: "/travel" },
     { label: "Computers", href: "/computers" },
+    { label: "Books", href: "/books" },
     // { label: "Audios & Writings", href: "/aw" },
     // { label: "Projects", href: "/projects" },
     // { label: "Documentations", href: "/docs" },
@@ -31,7 +32,7 @@ const Header = () => {
               Home
             </Link> */}
             
-            {/* <Dropdown label="Navigation" items={navigationItems} /> */}
+            <Dropdown label="Navigation" items={navigationItems} />
             {/* <Link href="/aw" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               Audios & Writings
             </Link> */}
