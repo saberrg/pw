@@ -2,7 +2,7 @@
 title: "Books Introduction"
 excerpt: "Introduction to the Books Tags"
 coverImage: "/assets/blog/dynamic-routing/cover.jpg"
-date: "2025-07-405:35:07.322Z"
+date: "2025-07-04T05:35:07.322Z"
 author:
   name: Saber
   picture: "/assets/blog/authors/Saber-G.jpg"
