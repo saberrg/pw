@@ -35,3 +35,30 @@ export function getPostsByTag(tag: string): Post[] {
 export function getAWPosts(): Post[] {
   return getPostsByTag('aw');
 }
+
+export function getAllTags(): string[] {
+  const allPosts = getAllPosts();
+  const allTags = allPosts
+    .flatMap(post => post.tags || [])
+    .filter((tag, index, array) => array.indexOf(tag) === index) // Remove duplicates
+    .sort(); // Sort alphabetically
+  
+  return allTags;
+}
+
+export function getTagWithPostCount(): { tag: string; count: number }[] {
+  const allPosts = getAllPosts();
+  const tagCounts: { [key: string]: number } = {};
+  
+  allPosts.forEach(post => {
+    if (post.tags) {
+      post.tags.forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    }
+  });
+  
+  return Object.entries(tagCounts)
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => a.tag.localeCompare(b.tag));
+}

@@ -8,6 +8,7 @@ author:
   picture: "/assets/blog/authors/Saber-G.jpg"
 ogImage:
   url: "/assets/blog/dynamic-routing/cover.jpg"
+tags: ["programming", "personal", "introduction"]
 ---
 
 In the Gracious name of the Lord Almighty

@@ -32,19 +32,23 @@ const Header = () => {
               Home
             </Link> */}
             
-            <Dropdown label="Navigation" items={navigationItems} />
-            {/* <Link href="/aw" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+            {/* <Dropdown label="Navigation" items={navigationItems} />
+            <Link href="/aw" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               Audios & Writings
-            </Link> */}
+            </Link>
             <Link href="/projects" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               Projects
             </Link>
-            {/* <Link href="/docs" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+            <Link href="/docs" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               Documentations
-            </Link> */}
-            {/* <Link href="/contact" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+            </Link>
+            <Link href="/contact" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
               Contact
             </Link> */}
+            
+            <Link href="/directory" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+              Directory
+            </Link>
             <div className="flex-grow"></div>
             <span className="ml-8"><ThemeSwitcher /></span>
           </nav>

@@ -8,7 +8,7 @@ excerpt: "How to be a good employee."
 coverImage: "/images/posts/podcast-ep1.jpg"
 ogImage:
   url: "/images/posts/podcast-ep1.jpg"
-tags: ["aw", "writing"]
+tags: ["aw", "writing", "career", "workplace", "productivity"]
 ---
 
 Love your job. If you don't like your job, go get a job you like. Duh!

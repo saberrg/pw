@@ -8,6 +8,7 @@ author:
   picture: "/assets/blog/authors/Saber-G.jpg"
 ogImage:
   url: "/assets/blog/hello-world/cover.jpg"
+tags: ["automation", "workflow", "tools", "review"]
 ---
 
 

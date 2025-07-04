@@ -8,6 +8,7 @@ author:
   picture: "/assets/blog/authors/Saber-G.jpg"
 ogImage:
   url: "/assets/blog/hello-world/cover.jpg"
+tags: ["wordpress", "web development", "clients", "business"]
 ---
 
 In the Most High Name. 
