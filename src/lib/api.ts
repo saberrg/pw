@@ -1,73 +1,85 @@
 import { Post } from "@/interfaces/post";
-import { db } from "./firebase";
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  query,
-  orderBy,
-  where,
-  Timestamp,
-} from "firebase/firestore";
+import { supabase } from "./supabase";
 
-// Collection name in Firestore
-const POSTS_COLLECTION = "posts";
+// Table name in Supabase
+const POSTS_TABLE = "posts";
 
-// Helper to convert Firestore document to Post
-function docToPost(docId: string, data: any): Post {
+// Helper to convert Supabase row to Post
+function rowToPost(row: any): Post {
   return {
-    slug: docId,
-    title: data.title || "",
-    date: data.date instanceof Timestamp 
-      ? data.date.toDate().toISOString() 
-      : data.date || "",
-    coverImage: data.coverImage || "",
-    author: data.author || { name: "", picture: "" },
-    excerpt: data.excerpt || "",
-    ogImage: data.ogImage || { url: "" },
-    content: data.content || "",
-    preview: data.preview || false,
-    tags: data.tags || [],
-    category: data.category || "",
+    slug: row.slug || row.id || "",
+    title: row.title || "",
+    date: row.date ? (typeof row.date === "string" ? row.date : row.date.toISOString()) : "",
+    coverImage: row.coverImage || "",
+    author: row.author || { name: "", picture: "" },
+    excerpt: row.excerpt || "",
+    ogImage: row.ogImage || { url: "" },
+    content: row.content || "",
+    preview: row.preview || false,
+    tags: row.tags || [],
+    category: row.category || "",
   };
 }
 
 export async function getPostSlugs(): Promise<string[]> {
-  const postsRef = collection(db, POSTS_COLLECTION);
-  const snapshot = await getDocs(postsRef);
-  return snapshot.docs.map((doc) => doc.id);
+  const { data, error } = await supabase
+    .from(POSTS_TABLE)
+    .select("slug, id");
+
+  if (error) {
+    console.error("Error fetching post slugs:", error);
+    return [];
+  }
+
+  return data?.map((row) => row.slug || row.id) || [];
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const docRef = doc(db, POSTS_COLLECTION, slug);
-  const docSnap = await getDoc(docRef);
+  const { data, error } = await supabase
+    .from(POSTS_TABLE)
+    .select("*")
+    .eq("slug", slug)
+    .single();
 
-  if (!docSnap.exists()) {
+  if (error || !data) {
+    if (error?.code !== "PGRST116") { // PGRST116 is "not found" error
+      console.error("Error fetching post by slug:", error);
+    }
     return null;
   }
 
-  return docToPost(docSnap.id, docSnap.data());
+  return rowToPost(data);
 }
 
 export async function getAllPosts(): Promise<Post[]> {
-  const postsRef = collection(db, POSTS_COLLECTION);
-  const q = query(postsRef, orderBy("date", "desc"));
-  const snapshot = await getDocs(q);
+  const { data, error } = await supabase
+    .from(POSTS_TABLE)
+    .select("*")
+    .order("date", { ascending: false });
 
-  return snapshot.docs.map((doc) => docToPost(doc.id, doc.data()));
+  if (error) {
+    console.error("Error fetching all posts:", error);
+    return [];
+  }
+
+  return data?.map((row) => rowToPost(row)) || [];
 }
 
 export async function getPostsByTag(tag: string): Promise<Post[]> {
-  const postsRef = collection(db, POSTS_COLLECTION);
-  const q = query(
-    postsRef,
-    where("tags", "array-contains", tag),
-    orderBy("date", "desc")
-  );
-  const snapshot = await getDocs(q);
+  const { data, error } = await supabase
+    .from(POSTS_TABLE)
+    .select("*")
+    .contains("tags", [tag])
+    .order("date", { ascending: false });
 
-  return snapshot.docs.map((doc) => docToPost(doc.id, doc.data()));
+  if (error) {
+    console.error("Error fetching posts by tag:", error);
+    // Fallback: fetch all posts and filter client-side if Supabase query fails
+    const allPosts = await getAllPosts();
+    return allPosts.filter((post) => post.tags?.includes(tag) || false);
+  }
+
+  return data?.map((row) => rowToPost(row)) || [];
 }
 
 export async function getAWPosts(): Promise<Post[]> {
