@@ -1,23 +1,40 @@
 import { Post } from "@/interfaces/post";
 import { supabase } from "./supabase";
 
-// Table name in Supabase
-const POSTS_TABLE = "posts";
+// Table names in Supabase
+const POSTS_TABLE = "blog_posts";
+const AUTHORS_TABLE = "authors";
+const TAGS_TABLE = "tags";
+const CATEGORIES_TABLE = "categories";
+const POST_TAGS_TABLE = "blog_post_tags";
+const POST_CATEGORIES_TABLE = "blog_post_categories";
 
-// Helper to convert Supabase row to Post
-function rowToPost(row: any): Post {
+// Helper to convert Supabase row with joins to Post
+function rowToPost(row: any, author?: any, tags?: any[], category?: any): Post {
   return {
     slug: row.slug || row.id || "",
     title: row.title || "",
-    date: row.date ? (typeof row.date === "string" ? row.date : row.date.toISOString()) : "",
-    coverImage: row.coverImage || "",
-    author: row.author || { name: "", picture: "" },
+    date: row.date 
+      ? (typeof row.date === "string" 
+          ? row.date 
+          : new Date(row.date).toISOString())
+      : row.created_at 
+        ? (typeof row.created_at === "string"
+            ? row.created_at
+            : new Date(row.created_at).toISOString())
+        : "",
+    coverImage: row.cover_image || row.coverImage || "",
+    author: author 
+      ? { name: author.name || "", picture: author.picture || "" }
+      : { name: "", picture: "" },
     excerpt: row.excerpt || "",
-    ogImage: row.ogImage || { url: "" },
+    ogImage: row.og_image 
+      ? (typeof row.og_image === "object" ? row.og_image : { url: row.og_image })
+      : { url: "" },
     content: row.content || "",
     preview: row.preview || false,
-    tags: row.tags || [],
-    category: row.category || "",
+    tags: tags?.map(t => t.name || t) || [],
+    category: category?.name || category || "",
   };
 }
 
@@ -35,51 +52,195 @@ export async function getPostSlugs(): Promise<string[]> {
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const { data, error } = await supabase
+  // Fetch the post
+  const { data: post, error: postError } = await supabase
     .from(POSTS_TABLE)
     .select("*")
     .eq("slug", slug)
     .single();
 
-  if (error || !data) {
-    if (error?.code !== "PGRST116") { // PGRST116 is "not found" error
-      console.error("Error fetching post by slug:", error);
+  if (postError || !post) {
+    if (postError?.code !== "PGRST116") { // PGRST116 is "not found" error
+      console.error("Error fetching post by slug:", postError);
     }
     return null;
   }
 
-  return rowToPost(data);
+  // Fetch author if author_id exists
+  let author = null;
+  if (post.author_id) {
+    const { data: authorData } = await supabase
+      .from(AUTHORS_TABLE)
+      .select("*")
+      .eq("id", post.author_id)
+      .single();
+    author = authorData;
+  }
+
+  // Fetch tags via junction table
+  const { data: postTags } = await supabase
+    .from(POST_TAGS_TABLE)
+    .select(`
+      ${TAGS_TABLE} (*)
+    `)
+    .eq("blog_post_id", post.id);
+
+  const tags = postTags?.map((pt: any) => pt.tags || pt.tag) || [];
+
+  // Fetch category via junction table
+  let category = null;
+  const { data: postCategory } = await supabase
+    .from(POST_CATEGORIES_TABLE)
+    .select(`
+      ${CATEGORIES_TABLE} (*)
+    `)
+    .eq("blog_post_id", post.id)
+    .limit(1)
+    .single();
+
+  category = (postCategory as any)?.categories || (postCategory as any)?.category || postCategory || null;
+
+  return rowToPost(post, author, tags, category);
 }
 
 export async function getAllPosts(): Promise<Post[]> {
-  const { data, error } = await supabase
+  const { data: posts, error } = await supabase
     .from(POSTS_TABLE)
     .select("*")
-    .order("date", { ascending: false });
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching all posts:", error);
     return [];
   }
 
-  return data?.map((row) => rowToPost(row)) || [];
+  if (!posts || posts.length === 0) {
+    return [];
+  }
+
+  // Fetch all related data in parallel
+  const postsWithRelations = await Promise.all(
+    posts.map(async (post) => {
+      // Fetch author
+      let author = null;
+      if (post.author_id) {
+        const { data: authorData } = await supabase
+          .from(AUTHORS_TABLE)
+          .select("*")
+          .eq("id", post.author_id)
+          .single();
+        author = authorData;
+      }
+
+      // Fetch tags
+      const { data: postTags } = await supabase
+        .from(POST_TAGS_TABLE)
+        .select(`
+          ${TAGS_TABLE} (*)
+        `)
+        .eq("blog_post_id", post.id);
+
+      const tags = postTags?.map((pt: any) => pt.tags || pt.tag).filter(Boolean) || [];
+
+      // Fetch category
+      const { data: postCategory } = await supabase
+        .from(POST_CATEGORIES_TABLE)
+        .select(`
+          ${CATEGORIES_TABLE} (*)
+        `)
+        .eq("blog_post_id", post.id)
+        .limit(1)
+        .single();
+
+      const categoryData = postCategory as any;
+      const category = categoryData?.categories || categoryData?.category || categoryData || null;
+
+      return rowToPost(post, author, tags, category);
+    })
+  );
+
+  return postsWithRelations;
 }
 
 export async function getPostsByTag(tag: string): Promise<Post[]> {
-  const { data, error } = await supabase
-    .from(POSTS_TABLE)
-    .select("*")
-    .contains("tags", [tag])
-    .order("date", { ascending: false });
+  // First, find the tag by name
+  const { data: tagData, error: tagError } = await supabase
+    .from(TAGS_TABLE)
+    .select("id")
+    .eq("name", tag)
+    .single();
 
-  if (error) {
-    console.error("Error fetching posts by tag:", error);
-    // Fallback: fetch all posts and filter client-side if Supabase query fails
+  if (tagError || !tagData) {
+    // Fallback: fetch all posts and filter client-side
     const allPosts = await getAllPosts();
     return allPosts.filter((post) => post.tags?.includes(tag) || false);
   }
 
-  return data?.map((row) => rowToPost(row)) || [];
+  // Get all post IDs with this tag
+  const { data: postTags, error: postTagsError } = await supabase
+    .from(POST_TAGS_TABLE)
+    .select("blog_post_id")
+    .eq("tag_id", tagData.id);
+
+  if (postTagsError || !postTags || postTags.length === 0) {
+    return [];
+  }
+
+  const postIds = postTags.map((pt: any) => pt.blog_post_id);
+
+  // Fetch posts
+  const { data: posts, error: postsError } = await supabase
+    .from(POSTS_TABLE)
+    .select("*")
+    .in("id", postIds)
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (postsError || !posts) {
+    console.error("Error fetching posts by tag:", postsError);
+    return [];
+  }
+
+  // Fetch all related data
+  const postsWithRelations = await Promise.all(
+    posts.map(async (post) => {
+      let author = null;
+      if (post.author_id) {
+        const { data: authorData } = await supabase
+          .from(AUTHORS_TABLE)
+          .select("*")
+          .eq("id", post.author_id)
+          .single();
+        author = authorData;
+      }
+
+      const { data: postTags } = await supabase
+        .from(POST_TAGS_TABLE)
+        .select(`
+          ${TAGS_TABLE} (*)
+        `)
+        .eq("blog_post_id", post.id);
+
+      const tags = postTags?.map((pt: any) => pt.tags || pt.tag).filter(Boolean) || [];
+
+      const { data: postCategory } = await supabase
+        .from(POST_CATEGORIES_TABLE)
+        .select(`
+          ${CATEGORIES_TABLE} (*)
+        `)
+        .eq("blog_post_id", post.id)
+        .limit(1)
+        .single();
+
+      const categoryData = postCategory as any;
+      const category = categoryData?.categories || categoryData?.category || categoryData || null;
+
+      return rowToPost(post, author, tags, category);
+    })
+  );
+
+  return postsWithRelations;
 }
 
 export async function getAWPosts(): Promise<Post[]> {
