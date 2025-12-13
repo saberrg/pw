@@ -3,8 +3,8 @@ import { Intro } from "@/app/_components/intro";
 import { PostList } from "@/app/_components/post-list";
 import { getAllPosts } from "@/lib/api";
 
-export default function Index() {
-  const allPosts = getAllPosts();
+export default async function Index() {
+  const allPosts = await getAllPosts();
   //console.log(allPosts);
   return (
     <main>

@@ -1,13 +1,13 @@
 import { getAllPosts, getTagWithPostCount } from "@/lib/api";
 import { DirectoryClient } from "./_components/directory-client";
 
-export default function DirectoryPage({
+export default async function DirectoryPage({
   searchParams,
 }: {
   searchParams: { tag?: string };
 }) {
-  const allPosts = getAllPosts();
-  const tagsWithCount = getTagWithPostCount();
+  const allPosts = await getAllPosts();
+  const tagsWithCount = await getTagWithPostCount();
   const selectedTag = searchParams.tag || null;
 
   return (

@@ -10,13 +10,15 @@ import { PostBody } from "@/app/_components/posts/post-body";
 import { PostHeader } from "@/app/_components/posts/post-header";
 
 type Props = {
-  params: { slug: string };
+  params: { slug: string[] };
 };
 
 export default async function Post({ params }: Props) {
   const resolvedParams = await params;
-  const { slug } = resolvedParams;
-  const post = getPostBySlug(slug);
+  const slug = Array.isArray(resolvedParams.slug)
+    ? resolvedParams.slug.join("/")
+    : (resolvedParams.slug as unknown as string);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     return notFound();
@@ -43,8 +45,10 @@ export default async function Post({ params }: Props) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
-  const { slug } = resolvedParams;
-  const post = getPostBySlug(slug);
+  const slug = Array.isArray(resolvedParams.slug)
+    ? resolvedParams.slug.join("/")
+    : (resolvedParams.slug as unknown as string);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     return notFound();
@@ -62,9 +66,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const posts = getAllPosts();
+  const posts = await getAllPosts();
 
   return posts.map((post) => ({
-    slug: post.slug,
+    slug: post.slug.split("/"),
   }));
 }
+
+
+

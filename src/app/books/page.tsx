@@ -3,7 +3,7 @@ import { PostList } from "@/app/_components/post-list";
 import { Intro } from "@/app/_components/intro";
 
 export default async function BooksPage() {
-  const allPosts = getAllPosts();
+  const allPosts = await getAllPosts();
   const bookPosts = allPosts.filter((post) => post.category === "book");
 
   return (
