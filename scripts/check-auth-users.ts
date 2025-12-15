@@ -130,3 +130,4 @@ checkAuthUsersTable()
     process.exit(1);
   });
 
+
