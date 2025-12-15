@@ -23,3 +23,4 @@ if (missingVars.length > 0) {
 export const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 
+

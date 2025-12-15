@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, getUser } from "@/lib/supabase-auth";
-import Link from "next/link";
 
 export default function AuthButton() {
   const router = useRouter();
@@ -59,15 +58,10 @@ export default function AuthButton() {
     );
   }
 
-  return (
-    <Link
-      href="/gg"
-      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-    >
-      Sign In
-    </Link>
-  );
+  // Don't show sign in link - return null when user is not authenticated
+  return null;
 }
+
 
 
 
