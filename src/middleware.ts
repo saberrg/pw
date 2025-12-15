@@ -54,8 +54,10 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refresh session if expired
-  await supabase.auth.getUser();
+  // Refresh session if expired - this is critical for SSR auth
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   return response;
 }
@@ -72,4 +74,5 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
+
 

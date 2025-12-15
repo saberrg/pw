@@ -1,6 +1,6 @@
 "use client";
 
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -11,14 +11,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// Create client-side Supabase client with auth support
-export const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+// Create client-side Supabase client with SSR support (uses cookies instead of localStorage)
+export const supabaseAuth = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
 // Helper functions for authentication
 export async function signIn(email: string, password: string) {
@@ -51,4 +45,5 @@ export async function getSession() {
   const { data: { session }, error } = await supabaseAuth.auth.getSession();
   return { session, error };
 }
+
 

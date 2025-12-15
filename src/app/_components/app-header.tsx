@@ -5,9 +5,30 @@ import AuthButton from "./auth-button";
 import { ThemeSwitcher } from "./theme-switcher";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getUser } from "@/lib/supabase-auth";
 
 export default function AppHeader() {
   const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { user } = await getUser();
+      setIsAuthenticated(!!user);
+    };
+    checkAuth();
+  }, []);
+
+  const navItems = [
+    { label: "Directory", href: "/directory" },
+    { label: "Quick Ref", href: "/quickref" },
+  ];
+
+  // Add Create Post link for authenticated users
+  if (isAuthenticated) {
+    navItems.push({ label: "Create Post", href: "/create" });
+  }
 
   return (
     <Header
@@ -16,10 +37,7 @@ export default function AppHeader() {
       logoHref="/"
       currentPath={pathname}
       LinkComponent={Link}
-      navItems={[
-        { label: "Directory", href: "/directory" },
-        { label: "Quick Ref", href: "/quickref" },
-      ]}
+      navItems={navItems}
       userMenu={
         <>
           <AuthButton />
