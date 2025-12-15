@@ -76,7 +76,23 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
   const insertEquation = () => {
     const latex = prompt("Enter LaTeX equation:");
     if (latex) {
-      editor.chain().focus().setMathInline(latex).run();
+      // Remove LaTeX delimiters if present
+      let cleanLatex = latex.trim();
+      
+      // Check if it's block math (\[...\])
+      if (cleanLatex.startsWith("\\[") && cleanLatex.endsWith("\\]")) {
+        cleanLatex = cleanLatex.slice(2, -2).trim();
+        editor.chain().focus().insertMathBlock({ tex: cleanLatex }).run();
+      }
+      // Check if it's inline math ($...$)
+      else if (cleanLatex.startsWith("$") && cleanLatex.endsWith("$")) {
+        cleanLatex = cleanLatex.slice(1, -1).trim();
+        editor.chain().focus().insertMathInline({ tex: cleanLatex }).run();
+      }
+      // Default to block math if no delimiters
+      else {
+        editor.chain().focus().insertMathBlock({ tex: cleanLatex }).run();
+      }
     }
   };
 

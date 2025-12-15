@@ -1,7 +1,7 @@
 import { parseISO, format, isValid } from "date-fns";
 
 type Props = {
-  dateString?: string;
+  dateString?: string | null;
 };
 
 const DateFormatter = ({ dateString }: Props) => {
