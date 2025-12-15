@@ -42,11 +42,11 @@ export default function Brand({
       )}
       {siteName && (
         <div className="flex flex-col">
-          <span className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <span className="text-xl font-semibold text-foreground">
             {siteName}
           </span>
           {subtitle && (
-            <span className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <span className="text-sm text-muted-foreground mt-1">
               {subtitle}
             </span>
           )}

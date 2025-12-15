@@ -46,12 +46,12 @@ export default function AuthButton() {
   if (user) {
     return (
       <div className="flex items-center space-x-4">
-        <span className="text-sm text-gray-600 dark:text-gray-400">
+        <span className="text-sm text-muted-foreground">
           {user.email}
         </span>
         <button
           onClick={handleSignOut}
-          className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           Sign Out
         </button>
@@ -62,10 +62,11 @@ export default function AuthButton() {
   return (
     <Link
       href="/gg"
-      className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
     >
       Sign In
     </Link>
   );
 }
+
 

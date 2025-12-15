@@ -38,17 +38,17 @@ export default function MobileMenu({
         aria-expanded={isMobileMenuOpen}
       >
         <span 
-          className={`w-6 h-0.5 bg-black dark:bg-white transition-all duration-300 ease-in-out rounded-sm origin-center relative block flex-shrink-0 ${
+          className={`w-6 h-0.5 bg-foreground transition-all duration-300 ease-in-out rounded-sm origin-center relative block flex-shrink-0 ${
             isMobileMenuOpen ? 'translate-y-1.5 rotate-45' : ''
           }`}
         />
         <span 
-          className={`w-6 h-0.5 bg-black dark:bg-white transition-all duration-300 ease-in-out rounded-sm origin-center relative block flex-shrink-0 ${
+          className={`w-6 h-0.5 bg-foreground transition-all duration-300 ease-in-out rounded-sm origin-center relative block flex-shrink-0 ${
             isMobileMenuOpen ? 'opacity-0 scale-x-0' : ''
           }`}
         />
         <span 
-          className={`w-6 h-0.5 bg-black dark:bg-white transition-all duration-300 ease-in-out rounded-sm origin-center relative block flex-shrink-0 ${
+          className={`w-6 h-0.5 bg-foreground transition-all duration-300 ease-in-out rounded-sm origin-center relative block flex-shrink-0 ${
             isMobileMenuOpen ? '-translate-y-1.5 -rotate-45' : ''
           }`}
         />

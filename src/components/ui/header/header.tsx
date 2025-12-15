@@ -106,7 +106,7 @@ export default function Header({
   }
 
   const headerClasses = [
-    'relative w-full bg-white dark:bg-zinc-950 text-gray-700 dark:text-zinc-100 z-[1000] transition-all duration-300 box-border m-0 p-0 border-b border-gray-200 dark:border-zinc-800 mb-8',
+    'relative w-full bg-background text-foreground z-[1000] transition-colors duration-300 box-border m-0 p-0 border-b border-border mb-8',
     sticky && 'sticky top-0',
     fixed && 'fixed top-0 left-0 right-0',
     theme === 'dark' && 'dark',

@@ -40,11 +40,11 @@ export default function MobileNavigation({
 
   return (
     <nav 
-      className={`absolute top-16 left-0 right-0 w-full box-border border-t transition-[max-height] duration-300 ease-in-out ${
+      className={`absolute top-16 left-0 right-0 w-full box-border border-t transition-[max-height,background-color,border-color] duration-300 ease-in-out ${
         isMobileMenuOpen 
-          ? 'max-h-[calc(100vh-4rem)] overflow-y-auto border-gray-200 dark:border-gray-700' 
+          ? 'max-h-[calc(100vh-4rem)] overflow-y-auto border-border' 
           : 'max-h-0 overflow-hidden border-transparent'
-      } bg-white dark:bg-gray-800`}
+      } bg-background`}
       aria-label="Mobile navigation"
     >
       <ul className="flex flex-col gap-2 list-none m-0 p-4 md:p-6">

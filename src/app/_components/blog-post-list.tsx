@@ -54,7 +54,7 @@ export function BlogPostList({ initialPosts = [], title }: BlogPostListProps) {
   return (
     <div className="space-y-8">
       {title && (
-        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-zinc-50">
+        <h2 className="text-2xl font-bold mb-6 text-foreground">
           {title}
         </h2>
       )}
@@ -63,17 +63,17 @@ export function BlogPostList({ initialPosts = [], title }: BlogPostListProps) {
           <Link
             key={post.id}
             href={`/blog/${post.slug}`}
-            className="block group py-6 px-4 -mx-4 rounded-lg border-l-4 border-transparent hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-accent/50 dark:hover:bg-zinc-800/50 transition-all duration-200"
+            className="block group py-6 px-4 -mx-4 rounded-lg border-l-4 border-transparent hover:border-foreground hover:bg-accent/50 transition-all duration-200"
           >
             <article>
-              <h3 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-zinc-50 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
+              <h3 className="text-2xl font-semibold mb-2 text-foreground group-hover:text-muted-foreground transition-colors">
                 {post.title}
               </h3>
               <div className="text-sm text-muted-foreground mb-3">
                 <DateFormatter dateString={post.published_at} />
               </div>
               {post.excerpt && (
-                <p className="text-base leading-relaxed text-gray-600 dark:text-zinc-400 line-clamp-3">
+                <p className="text-base leading-relaxed text-muted-foreground line-clamp-3">
                   {post.excerpt}
                 </p>
               )}

@@ -1,9 +1,8 @@
 import Footer from "@/app/_components/footer";
 import AppHeader from "@/app/_components/app-header";
-import { CMS_NAME, HOME_OG_IMAGE_URL } from "@/lib/constants";
+import { HOME_OG_IMAGE_URL } from "@/lib/constants";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import cn from "classnames";
 import { Toaster } from "@/app/_components/ui/sonner";
 
 import "./globals.css";
@@ -24,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link
           rel="icon"
@@ -41,9 +40,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#000" />
         <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
       </head>
-      <body
-        className={cn(inter.className, "dark:bg-zinc-950 dark:text-zinc-100")}
-      >
+      <body className={inter.className}>
         <div className="min-h-screen">
           <AppHeader />
           {children}

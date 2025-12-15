@@ -27,8 +27,8 @@ export default async function BlogPostPage({ params }: Props) {
       <Container>
         <article className="mb-32">
           {/* Header */}
-          <header className="mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+          <header className="mb-8 pb-8 border-b border-border">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
               {post.title}
             </h1>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">

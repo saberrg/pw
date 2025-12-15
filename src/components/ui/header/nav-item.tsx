@@ -33,14 +33,14 @@ export default function NavItem({
     const buttonClass = isMobile
       ? `flex items-center justify-between w-full px-4 py-3.5 no-underline text-base font-medium rounded-md transition-all duration-200 bg-transparent border-none cursor-pointer font-inherit text-left ${
           isActiveLink 
-            ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+            ? 'text-foreground bg-accent' 
+            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
         }`
       : `flex items-center gap-2 px-4 py-2 no-underline text-[0.9375rem] font-medium rounded-md transition-all duration-200 bg-transparent border-none cursor-pointer font-inherit ${
           isActiveLink 
-            ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
+            ? 'text-foreground bg-accent' 
+            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+        } focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2`
     
     return (
       <li className={isMobile ? 'w-full' : 'relative'}>
@@ -67,7 +67,7 @@ export default function NavItem({
               ? `max-h-0 overflow-hidden list-none m-0 p-0 transition-[max-height] duration-300 ease-in-out ${
                   isDropdownOpen ? 'max-h-[500px] py-2 pl-4' : ''
                 }`
-              : `absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg list-none p-2 min-w-[12rem] z-[100] transition-all duration-200 ${
+              : `absolute top-full left-0 mt-2 bg-popover border border-border rounded-lg shadow-lg list-none p-2 min-w-[12rem] z-[100] transition-all duration-200 ${
                   isDropdownOpen 
                     ? 'opacity-100 visible translate-y-0' 
                     : 'opacity-0 invisible -translate-y-2'
@@ -88,14 +88,14 @@ export default function NavItem({
             const childLinkClass = isMobile
               ? `block px-4 py-3 no-underline text-[0.9375rem] rounded-md transition-all duration-200 opacity-80 ${
                   isChildActive
-                    ? 'text-blue-500 font-medium' 
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
+                    ? 'text-foreground font-medium' 
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 }`
               : `block px-3 py-2.5 no-underline text-[0.9375rem] rounded-md transition-all duration-200 ${
                   isChildActive
-                    ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20 font-medium' 
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-900'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
+                    ? 'text-foreground bg-accent font-medium' 
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                } focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2`
 
             const childLinkProps = {
               href: child.href,
@@ -134,14 +134,14 @@ export default function NavItem({
   const linkClass = isMobile
     ? `flex items-center justify-between w-full px-4 py-3.5 no-underline text-base font-medium rounded-md transition-all duration-200 bg-transparent border-none cursor-pointer font-inherit text-left ${
         isActiveLink 
-          ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-      } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
+          ? 'text-foreground bg-accent' 
+          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+      } focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2`
     : `flex items-center gap-2 px-4 py-2 no-underline text-[0.9375rem] font-medium rounded-md transition-all duration-200 bg-transparent border-none cursor-pointer font-inherit ${
         isActiveLink 
-          ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-      } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
+          ? 'text-foreground bg-accent' 
+          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+      } focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2`
 
   const linkProps = {
     href: item.href,
