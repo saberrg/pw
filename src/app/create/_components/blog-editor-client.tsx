@@ -23,14 +23,15 @@ export default function BlogEditorClient({ userId }: BlogEditorClientProps) {
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [saving, setSaving] = useState(false);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
   // Auto-generate slug from title
   const handleTitleChange = (value: string) => {
     setTitle(value);
-    if (!slug) {
+    if (!slugManuallyEdited) {
       const autoSlug = value
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/\s+/g, "-")
         .replace(/^-|-$/g, "");
       setSlug(autoSlug);
     }
@@ -145,7 +146,10 @@ export default function BlogEditorClient({ userId }: BlogEditorClientProps) {
           id="slug"
           type="text"
           value={slug}
-          onChange={(e) => setSlug(e.target.value)}
+          onChange={(e) => {
+            setSlug(e.target.value);
+            setSlugManuallyEdited(true);
+          }}
           placeholder="blog-post-url"
           required
           className="mt-2"
