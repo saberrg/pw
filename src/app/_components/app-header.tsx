@@ -21,7 +21,7 @@ export default function AppHeader() {
   }, []);
 
   const navItems = [
-    { label: "Directory", href: "/directory" },
+    // { label: "Directory", href: "/directory" },
     { label: "Quick Ref", href: "/quickref" },
   ];
 
