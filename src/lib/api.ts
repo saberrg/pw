@@ -109,7 +109,6 @@ export async function getAllPosts(): Promise<Post[]> {
   const { data: posts, error } = await supabase
     .from(POSTS_TABLE)
     .select("*")
-    .order("date", { ascending: false })
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -196,7 +195,6 @@ export async function getPostsByTag(tag: string): Promise<Post[]> {
     .from(POSTS_TABLE)
     .select("*")
     .in("id", postIds)
-    .order("date", { ascending: false })
     .order("created_at", { ascending: false });
 
   if (postsError || !posts) {
