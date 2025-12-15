@@ -5,26 +5,38 @@
     "build": "next build",
     "start": "next start",
     "check:supabase": "tsx scripts/check-supabase-tables.ts",
-    "check:schema": "tsx scripts/check-supabase-schema.ts"
+    "check:schema": "tsx scripts/check-supabase-schema.ts",
+    "check:auth": "tsx scripts/check-auth-table.ts"
   },
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.49.8",
+    "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
+    "clsx": "^2.1.1",
     "date-fns": "^2.30.0",
     "gray-matter": "^4.0.3",
+    "lucide-react": "^0.561.0",
     "next": "13.5.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "remark": "^15.0.1",
-    "remark-html": "^16.0.1"
+    "remark-html": "^16.0.1",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
     "@types/node": "^20.14.8",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.19",
     "dotenv": "^17.2.3",
     "postcss": "^8.4.38",
+    "shadcn": "^3.6.1",
     "tailwindcss": "^3.4.4",
     "tsx": "^4.21.0",
     "typescript": "^5.0.4"

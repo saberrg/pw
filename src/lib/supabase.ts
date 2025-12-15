@@ -21,3 +21,4 @@ if (missingVars.length > 0) {
 
 // Initialize Supabase client
 export const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+

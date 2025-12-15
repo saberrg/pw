@@ -1,4 +1,6 @@
 import { Post } from "@/interfaces/post";
+import { QuickRef, CreateQuickRefInput, UpdateQuickRefInput } from "@/interfaces/quickref";
+import { BlogPost } from "@/interfaces/blog-post";
 import { supabase } from "./supabase";
 
 // Table names in Supabase
@@ -275,3 +277,149 @@ export async function getTagWithPostCount(): Promise<
     .map(([tag, count]) => ({ tag, count }))
     .sort((a, b) => a.tag.localeCompare(b.tag));
 }
+
+// Quick Reference functions
+const QUICK_REF_TABLE = "quick_ref";
+
+export async function getAllQuickRefs(): Promise<QuickRef[]> {
+  const { data, error } = await supabase
+    .from(QUICK_REF_TABLE)
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching quick refs:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export async function getQuickRefById(id: string): Promise<QuickRef | null> {
+  const { data, error } = await supabase
+    .from(QUICK_REF_TABLE)
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching quick ref by id:", error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function createQuickRef(input: CreateQuickRefInput): Promise<QuickRef | null> {
+  const { data, error } = await supabase
+    .from(QUICK_REF_TABLE)
+    .insert({
+      name: input.name,
+      content: input.content || null,
+      link: input.link || null,
+      tag: input.tag || null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating quick ref:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function updateQuickRef(
+  id: string,
+  input: UpdateQuickRefInput
+): Promise<QuickRef | null> {
+  const updateData: any = {};
+  if (input.name !== undefined) updateData.name = input.name;
+  if (input.content !== undefined) updateData.content = input.content;
+  if (input.link !== undefined) updateData.link = input.link;
+  if (input.tag !== undefined) updateData.tag = input.tag;
+  updateData.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from(QUICK_REF_TABLE)
+    .update(updateData)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating quick ref:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function deleteQuickRef(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from(QUICK_REF_TABLE)
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting quick ref:", error);
+    throw error;
+  }
+
+  return true;
+}
+
+// Blog Posts Functions (for new blog_posts table)
+export async function getAllBlogPostsServer(): Promise<BlogPost[]> {
+  const { data, error } = await supabase
+    .from(POSTS_TABLE)
+    .select("*")
+    .eq("status", "published")
+    .order("published_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching blog posts:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export async function getBlogPostBySlugServer(slug: string): Promise<BlogPost | null> {
+  const { data, error } = await supabase
+    .from(POSTS_TABLE)
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  if (error) {
+    if (error.code !== "PGRST116") { // Not found error
+      console.error("Error fetching blog post:", error);
+    }
+    return null;
+  }
+
+  return data;
+}
+
+export async function incrementBlogPostViewCountServer(id: number): Promise<void> {
+  // Direct update instead of RPC for simplicity
+  const { data: currentPost } = await supabase
+    .from(POSTS_TABLE)
+    .select("view_count")
+    .eq("id", id)
+    .single();
+
+  if (currentPost) {
+    const { error } = await supabase
+      .from(POSTS_TABLE)
+      .update({ view_count: (currentPost.view_count || 0) + 1 })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error incrementing view count:", error);
+    }
+  }
+}
+
