@@ -82,16 +82,16 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
       // Check if it's block math (\[...\])
       if (cleanLatex.startsWith("\\[") && cleanLatex.endsWith("\\]")) {
         cleanLatex = cleanLatex.slice(2, -2).trim();
-        editor.chain().focus().insertMathBlock({ tex: cleanLatex }).run();
+        editor.chain().focus().insertBlockMath({ latex: cleanLatex }).run();
       }
       // Check if it's inline math ($...$)
       else if (cleanLatex.startsWith("$") && cleanLatex.endsWith("$")) {
         cleanLatex = cleanLatex.slice(1, -1).trim();
-        editor.chain().focus().insertMathInline({ tex: cleanLatex }).run();
+        editor.chain().focus().insertInlineMath({ latex: cleanLatex }).run();
       }
       // Default to block math if no delimiters
       else {
-        editor.chain().focus().insertMathBlock({ tex: cleanLatex }).run();
+        editor.chain().focus().insertBlockMath({ latex: cleanLatex }).run();
       }
     }
   };
