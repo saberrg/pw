@@ -13,6 +13,7 @@ export interface MobileMenuProps {
     onClick?: () => void
     href?: string
   }
+  userMenu?: React.ReactNode
   LinkComponent?: React.ComponentType<any>
   onNavigate?: (href: string) => void
 }
@@ -25,6 +26,7 @@ export default function MobileMenu({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
   ctaButton,
+  userMenu,
   LinkComponent,
   onNavigate
 }: MobileMenuProps) {
@@ -63,6 +65,7 @@ export default function MobileMenu({
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
         ctaButton={ctaButton}
+        userMenu={userMenu}
         LinkComponent={LinkComponent}
         onNavigate={onNavigate}
       />

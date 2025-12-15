@@ -145,11 +145,13 @@ export default function Header({
         {/* Right side actions */}
         <div className="flex items-center gap-4 flex-shrink-0">
           
-          {/* User Menu */}
+          {/* User Menu (desktop only; mobile version lives inside the mobile panel) */}
           {userMenu && (
-            <UserMenu>
-              {userMenu}
-            </UserMenu>
+            <div className="hidden md:flex">
+              <UserMenu>
+                {userMenu}
+              </UserMenu>
+            </div>
           )}
 
           {/* CTA Button */}
@@ -172,6 +174,7 @@ export default function Header({
             isMobileMenuOpen={isMobileMenuOpen}
             setIsMobileMenuOpen={setIsMobileMenuOpen}
             ctaButton={ctaButton}
+            userMenu={userMenu}
             LinkComponent={LinkComponent}
             onNavigate={onNavigate}
           />
