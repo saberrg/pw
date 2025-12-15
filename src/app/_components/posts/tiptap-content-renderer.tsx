@@ -72,9 +72,6 @@ export default function TipTapContentRenderer({ content }: TipTapContentRenderer
         },
       }),
       Mathematics.configure({
-        HTMLAttributes: {
-          class: "math-inline",
-        },
         katexOptions: {
           throwOnError: false,
         },
