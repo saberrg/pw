@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Container from "@/app/_components/container";
 import DateFormatter from "@/app/_components/date-formatter";
 import { getBlogPostBySlugServer, incrementBlogPostViewCountServer } from "@/lib/api";
-import markdownToHtml from "@/lib/markdownToHtml";
+import TipTapContentRenderer from "@/app/_components/posts/tiptap-content-renderer";
 
 type Props = {
   params: { slug: string };
@@ -22,9 +22,6 @@ export default async function BlogPostPage({ params }: Props) {
     await incrementBlogPostViewCountServer(post.id);
   }
 
-  // Convert content to HTML (if it's markdown)
-  const content = await markdownToHtml(post.content || "");
-
   return (
     <main>
       <Container>
@@ -42,10 +39,7 @@ export default async function BlogPostPage({ params }: Props) {
           </header>
 
           {/* Content */}
-          <div
-            className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-primary hover:prose-a:text-primary/80 prose-pre:bg-gray-100 dark:prose-pre:bg-gray-900 prose-code:text-gray-900 dark:prose-code:text-gray-100"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
+          <TipTapContentRenderer content={post.content || ""} />
         </article>
       </Container>
     </main>

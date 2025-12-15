@@ -4,7 +4,7 @@ export interface BlogPost {
   slug: string;
   content: string;
   excerpt: string | null;
-  author_id: number | null;
+  author_id: string | null;
   status: 'draft' | 'published' | 'archived';
   featured_image_id: number | null;
   view_count: number;
@@ -20,7 +20,7 @@ export interface CreateBlogPostInput {
   slug: string;
   content: string;
   excerpt?: string;
-  author_id?: number;
+  author_id?: string;
   status?: 'draft' | 'published' | 'archived';
   featured_image_id?: number;
   meta_title?: string;
