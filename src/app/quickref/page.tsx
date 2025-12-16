@@ -18,10 +18,10 @@ export default function QuickRefPage() {
     <main>
       <Container>
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
+          <h1 className="text-4xl font-bold mb-2 text-foreground">
             Quick References
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground">
             A collection of quick references and useful links.
           </p>
         </div>
