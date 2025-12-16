@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BlogEditor from "./blog-editor";
 import { supabaseAuth } from "@/lib/supabase-auth";
@@ -9,21 +9,38 @@ import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Textarea } from "@/app/_components/ui/textarea";
 import { toast } from "sonner";
+import { BlogPost } from "@/interfaces/blog-post";
+import { updateBlogPostClient } from "@/lib/api-client";
 
 interface BlogEditorClientProps {
   userId: string;
+  initialPost?: BlogPost;
 }
 
-export default function BlogEditorClient({ userId }: BlogEditorClientProps) {
+export default function BlogEditorClient({ userId, initialPost }: BlogEditorClientProps) {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [metaTitle, setMetaTitle] = useState("");
-  const [metaDescription, setMetaDescription] = useState("");
+  const isEditMode = !!initialPost;
+  const [title, setTitle] = useState(initialPost?.title || "");
+  const [slug, setSlug] = useState(initialPost?.slug || "");
+  const [excerpt, setExcerpt] = useState(initialPost?.excerpt || "");
+  const [content, setContent] = useState(initialPost?.content || "");
+  const [metaTitle, setMetaTitle] = useState(initialPost?.meta_title || "");
+  const [metaDescription, setMetaDescription] = useState(initialPost?.meta_description || "");
   const [saving, setSaving] = useState(false);
-  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEditMode);
+
+  // Initialize form when initialPost changes
+  useEffect(() => {
+    if (initialPost) {
+      setTitle(initialPost.title || "");
+      setSlug(initialPost.slug || "");
+      setExcerpt(initialPost.excerpt || "");
+      setContent(initialPost.content || "");
+      setMetaTitle(initialPost.meta_title || "");
+      setMetaDescription(initialPost.meta_description || "");
+      setSlugManuallyEdited(true);
+    }
+  }, [initialPost]);
 
   // Auto-generate slug from title
   const handleTitleChange = (value: string) => {
@@ -62,7 +79,7 @@ export default function BlogEditorClient({ userId }: BlogEditorClientProps) {
     setSaving(true);
 
     try {
-      const postData = {
+      const postData: any = {
         title,
         slug,
         content,
@@ -71,53 +88,114 @@ export default function BlogEditorClient({ userId }: BlogEditorClientProps) {
         status: publishNow ? "published" : "draft",
         meta_title: metaTitle || null,
         meta_description: metaDescription || null,
-        published_at: publishNow ? new Date().toISOString() : null,
       };
 
-      // Insert blog post
-      const { data: post, error: saveError } = await supabaseAuth
-        .from("blog_posts")
-        .insert(postData)
-        .select()
-        .single();
-
-      if (saveError) throw saveError;
-
-      // Extract and save images
-      if (content) {
-        const images = extractImagesFromContent(content);
-        if (images.length > 0) {
-          const imageRecords = images.map((img) => ({
-            blog_post_id: post.id,
-            image_order: img.order,
-            file_path: img.src,
-            alt_text: img.alt,
-            file_name: img.src.split("/").pop() || "",
-          }));
-
-          const { error: imageError } = await supabaseAuth
-            .from("blog_images")
-            .insert(imageRecords);
-
-          if (imageError) {
-            console.error("Error saving images:", imageError);
-            // Don't fail the whole operation if images fail
-          }
-        }
+      // Handle published_at: set if publishing, preserve if already published and saving as draft
+      if (publishNow) {
+        postData.published_at = new Date().toISOString();
+      } else if (isEditMode && initialPost?.published_at) {
+        // Preserve existing published_at if saving as draft
+        postData.published_at = initialPost.published_at;
+      } else {
+        postData.published_at = null;
       }
 
-      toast.success(publishNow ? "Post published successfully!" : "Draft saved successfully!");
-      
-      // Redirect to blog post
-      if (publishNow) {
-        router.push(`/blog/${post.slug}`);
+      if (isEditMode && initialPost?.id) {
+        // Update existing post
+        const updatedPost = await updateBlogPostClient(initialPost.id, postData);
+        
+        if (!updatedPost) {
+          throw new Error("Failed to update blog post");
+        }
+
+        // Delete old images
+        const { error: deleteImageError } = await supabaseAuth
+          .from("blog_images")
+          .delete()
+          .eq("blog_post_id", initialPost.id);
+
+        if (deleteImageError) {
+          console.error("Error deleting old images:", deleteImageError);
+          // Continue with image insertion
+        }
+
+        // Extract and save new images
+        if (content) {
+          const images = extractImagesFromContent(content);
+          if (images.length > 0) {
+            const imageRecords = images.map((img) => ({
+              blog_post_id: initialPost.id,
+              image_order: img.order,
+              file_path: img.src,
+              alt_text: img.alt,
+              file_name: img.src.split("/").pop() || "",
+            }));
+
+            const { error: imageError } = await supabaseAuth
+              .from("blog_images")
+              .insert(imageRecords);
+
+            if (imageError) {
+              console.error("Error saving images:", imageError);
+              // Don't fail the whole operation if images fail
+            }
+          }
+        }
+
+        toast.success(publishNow ? "Post updated and published!" : "Post updated successfully!");
+        
+        // Redirect to blog post
+        if (publishNow) {
+          router.push(`/blog/${updatedPost.slug}`);
+        } else {
+          router.push(`/blog/${updatedPost.slug}`);
+        }
       } else {
-        // For drafts, we could redirect to an edit page
-        router.push(`/`);
+        // Insert new blog post
+        const { data: post, error: saveError } = await supabaseAuth
+          .from("blog_posts")
+          .insert(postData)
+          .select()
+          .single();
+
+        if (saveError) throw saveError;
+
+        // Extract and save images
+        if (content) {
+          const images = extractImagesFromContent(content);
+          if (images.length > 0) {
+            const imageRecords = images.map((img) => ({
+              blog_post_id: post.id,
+              image_order: img.order,
+              file_path: img.src,
+              alt_text: img.alt,
+              file_name: img.src.split("/").pop() || "",
+            }));
+
+            const { error: imageError } = await supabaseAuth
+              .from("blog_images")
+              .insert(imageRecords);
+
+            if (imageError) {
+              console.error("Error saving images:", imageError);
+              // Don't fail the whole operation if images fail
+            }
+          }
+        }
+
+        toast.success(publishNow ? "Post published successfully!" : "Draft saved successfully!");
+        
+        // Redirect to blog post
+        if (publishNow) {
+          router.push(`/blog/${post.slug}`);
+        } else {
+          // For drafts, we could redirect to an edit page
+          router.push(`/`);
+        }
       }
     } catch (err: any) {
       console.error("Save error:", err);
-      toast.error(err.message || "Failed to save blog post");
+      toast.error(err.message || `Failed to ${isEditMode ? "update" : "save"} blog post`);
     } finally {
       setSaving(false);
     }
@@ -152,10 +230,12 @@ export default function BlogEditorClient({ userId }: BlogEditorClientProps) {
           }}
           placeholder="blog-post-url"
           required
+          disabled={isEditMode}
           className="mt-2"
         />
         <p className="text-sm text-muted-foreground mt-1">
           URL: /blog/{slug || "your-slug"}
+          {isEditMode && " (read-only)"}
         </p>
       </div>
 
@@ -218,13 +298,13 @@ export default function BlogEditorClient({ userId }: BlogEditorClientProps) {
           disabled={!title || !slug || saving}
           variant="outline"
         >
-          {saving ? "Saving..." : "Save Draft"}
+          {saving ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update Draft" : "Save Draft")}
         </Button>
         <Button
           onClick={() => handleSave(true)}
           disabled={!title || !slug || !content || saving}
         >
-          {saving ? "Publishing..." : "Publish"}
+          {saving ? (isEditMode ? "Updating..." : "Publishing...") : (isEditMode ? "Update & Publish" : "Publish")}
         </Button>
       </div>
     </div>

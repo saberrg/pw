@@ -4,6 +4,8 @@ import Container from "@/app/_components/container";
 import DateFormatter from "@/app/_components/date-formatter";
 import { getBlogPostBySlugServer, incrementBlogPostViewCountServer } from "@/lib/api";
 import TipTapContentRenderer from "@/app/_components/posts/tiptap-content-renderer";
+import { getCurrentUser } from "@/lib/supabase-server";
+import BlogPostActions from "./_components/blog-post-actions";
 
 type Props = {
   params: { slug: string };
@@ -22,19 +24,28 @@ export default async function BlogPostPage({ params }: Props) {
     await incrementBlogPostViewCountServer(post.id);
   }
 
+  // Check authentication
+  const { user } = await getCurrentUser();
+  const isAuthenticated = !!user;
+
   return (
     <main>
       <Container>
         <article className="mb-32">
           {/* Header */}
           <header className="mb-8 pb-8 border-b border-border">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-              {post.title}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground flex-1">
+                {post.title}
+              </h1>
+              {isAuthenticated && post.id && (
+                <BlogPostActions postId={post.id} postSlug={post.slug} />
+              )}
+            </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <DateFormatter dateString={post.published_at} />
               <span>•</span>
-              <span>{post.view_count} views</span>
+              {/* <span>{post.view_count} views</span> */}
             </div>
           </header>
 

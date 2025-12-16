@@ -122,3 +122,54 @@ export async function incrementBlogPostViewCount(id: number): Promise<void> {
   }
 }
 
+export async function updateBlogPostClient(
+  id: number,
+  data: Partial<BlogPost>
+): Promise<BlogPost | null> {
+  const updateData: any = { ...data };
+  // Always update updated_at timestamp
+  updateData.updated_at = new Date().toISOString();
+  // Don't update created_at
+  delete updateData.created_at;
+
+  const { data: updatedPost, error } = await supabaseAuth
+    .from(BLOG_POSTS_TABLE)
+    .update(updateData)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating blog post:", error);
+    throw error;
+  }
+
+  return updatedPost;
+}
+
+export async function deleteBlogPostClient(id: number): Promise<boolean> {
+  // First, delete related blog_images
+  const { error: imageError } = await supabaseAuth
+    .from("blog_images")
+    .delete()
+    .eq("blog_post_id", id);
+
+  if (imageError) {
+    console.error("Error deleting blog images:", imageError);
+    // Continue with post deletion even if image deletion fails
+  }
+
+  // Then delete the blog post
+  const { error } = await supabaseAuth
+    .from(BLOG_POSTS_TABLE)
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting blog post:", error);
+    throw error;
+  }
+
+  return true;
+}
+
