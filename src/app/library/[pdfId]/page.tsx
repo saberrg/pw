@@ -92,6 +92,7 @@ export default async function PdfViewerPage({ params }: PageProps) {
         <PdfViewerWrapper
           pdfId={pdfId}
           pdfUrl={signedUrlData.signedUrl}
+          pdfTitle={pdf.title}
           initialPage={initialPage}
           userId={user.id}
         />

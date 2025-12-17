@@ -19,6 +19,7 @@ const PdfViewerClient = dynamic(
 interface PdfViewerWrapperProps {
   pdfId: string;
   pdfUrl: string;
+  pdfTitle: string;
   initialPage: number;
   userId: string;
 }

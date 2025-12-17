@@ -5,6 +5,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { useDebouncedCallback } from "use-debounce";
 import { supabaseAuth } from "@/lib/supabase-auth";
 import { Button } from "@/app/_components/ui/button";
+import { NotesBottomSheet } from "./notes-bottom-sheet";
 
 // Note: TextLayer and AnnotationLayer CSS not needed since we disable these layers
 // This prevents the "TextLayer task cancelled" warning
@@ -15,11 +16,12 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 interface PdfViewerClientProps {
   pdfId: string;
   pdfUrl: string;
+  pdfTitle: string;
   initialPage: number;
   userId: string;
 }
 
-export function PdfViewerClient({ pdfId, pdfUrl, initialPage, userId }: PdfViewerClientProps) {
+export function PdfViewerClient({ pdfId, pdfUrl, pdfTitle, initialPage, userId }: PdfViewerClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLDivElement>(null);
   
@@ -343,6 +345,14 @@ export function PdfViewerClient({ pdfId, pdfUrl, initialPage, userId }: PdfViewe
           Swipe left/right to navigate pages
         </div>
       )}
+
+      {/* Notes Bottom Sheet */}
+      <NotesBottomSheet
+        pdfId={pdfId}
+        pdfTitle={pdfTitle}
+        currentPage={currentPage}
+        userId={userId}
+      />
     </div>
   );
 }
