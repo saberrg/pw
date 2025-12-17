@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient, getCurrentUser } from "@/lib/supabase-server";
-import { LibraryGrid } from "./_components/library-grid";
+import { LibraryContent } from "./_components/library-content";
 import { UploadPdfDialog } from "./_components/upload-pdf-dialog";
 
 export interface PdfWithProgress {
@@ -88,7 +88,7 @@ export default async function LibraryPage() {
           </div>
         </div>
       ) : (
-        <LibraryGrid pdfs={pdfsWithProgress} />
+        <LibraryContent pdfs={pdfsWithProgress} />
       )}
     </div>
   );
