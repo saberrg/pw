@@ -130,7 +130,7 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
           <TooltipTrigger asChild>
             <Toggle
               size="sm"
-              pressed={editor.isActive("underline")}
+              pressed={editor.isActive("customUnderline")}
               onPressedChange={() => editor.chain().focus().toggleUnderline().run()}
             >
               <UnderlineIcon className="h-4 w-4" />
@@ -339,7 +339,7 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
               <PopoverTrigger asChild>
                 <Toggle
                   size="sm"
-                  pressed={editor.isActive("link")}
+                  pressed={editor.isActive("customLink")}
                 >
                   <LinkIcon className="h-4 w-4" />
                 </Toggle>
@@ -360,7 +360,7 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
                 <Button onClick={handleSetLink} size="sm" className="flex-1">
                   Set Link
                 </Button>
-                {editor.isActive("link") && (
+                {editor.isActive("customLink") && (
                   <Button onClick={handleRemoveLink} size="sm" variant="destructive">
                     Remove
                   </Button>

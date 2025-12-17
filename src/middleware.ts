@@ -1,3 +1,15 @@
+/**
+ * Authentication Middleware
+ * 
+ * NOTE: As of Next.js 16, the "middleware" convention is deprecated in favor of "proxy".
+ * This middleware will continue to work but may need to be migrated to proxy.ts in the future.
+ * See: https://nextjs.org/docs/messages/middleware-to-proxy
+ * 
+ * Current functionality:
+ * - Refreshes Supabase auth session
+ * - Protects /library routes by redirecting unauthenticated users to /gg
+ */
+
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 

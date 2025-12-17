@@ -25,6 +25,50 @@ interface BlogEditorProps {
   onChange: (content: string) => void;
 }
 
+// Create custom extensions with unique names to avoid duplicate warnings
+// This is needed because Tiptap v3 may detect duplicates during HMR
+const CustomLink = Link.extend({
+  name: 'customLink',
+});
+
+const CustomUnderline = Underline.extend({
+  name: 'customUnderline',
+});
+
+// Define extensions outside component to prevent recreation on each render
+const editorExtensions = [
+  StarterKit.configure({
+    // Explicitly configure to avoid any potential conflicts
+  }),
+  CustomUnderline,
+  CustomLink.configure({
+    openOnClick: false,
+    HTMLAttributes: {
+      class: "text-blue-600 underline dark:text-blue-400",
+    },
+  }),
+  Image.configure({
+    HTMLAttributes: {
+      class: "max-w-full h-auto rounded-lg",
+    },
+  }),
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
+  }),
+  Table,
+  TableRow,
+  TableHeader,
+  TableCell,
+  TaskList,
+  TaskItem.configure({
+    nested: true,
+  }),
+  Mathematics,
+  Placeholder.configure({
+    placeholder: "Start writing your blog post...",
+  }),
+];
+
 export default function BlogEditor({ content, onChange }: BlogEditorProps) {
   const [uploading, setUploading] = useState(false);
 
@@ -61,36 +105,7 @@ export default function BlogEditor({ content, onChange }: BlogEditorProps) {
 
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: "text-blue-600 underline dark:text-blue-400",
-        },
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: "max-w-full h-auto rounded-lg",
-        },
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Table,
-      TableRow,
-      TableHeader,
-      TableCell,
-      TaskList,
-      TaskItem.configure({
-        nested: true,
-      }),
-      Mathematics,
-      Placeholder.configure({
-        placeholder: "Start writing your blog post...",
-      }),
-    ],
+    extensions: editorExtensions,
     content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());

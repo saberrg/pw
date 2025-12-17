@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, createClient } from "@/lib/supabase-server";
+import { createClient } from "@/lib/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,9 +15,12 @@ function sanitizeFileName(fileName: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Check authentication
-    const { user } = await getCurrentUser();
-    if (!user) {
+    // 1. Create supabase client and check authentication
+    // Use a single client instance to ensure consistent auth context
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: "You must be signed in to upload PDFs" },
         { status: 401 }
@@ -59,8 +62,7 @@ export async function POST(request: NextRequest) {
     const sanitizedName = sanitizeFileName(fileName);
     const storagePath = `${timestamp}-${sanitizedName}`;
 
-    // 6. Create signed upload URL
-    const supabase = await createClient();
+    // 6. Create signed upload URL (using same client)
     const { data, error } = await supabase.storage
       .from("library")
       .createSignedUploadUrl(storagePath);

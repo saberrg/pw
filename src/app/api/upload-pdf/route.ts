@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getCurrentUser, createClient } from "@/lib/supabase-server";
+import { createClient } from "@/lib/supabase-server";
 
 /**
  * DEPRECATED: This route has issues with large files due to Next.js body size limits.
@@ -27,9 +27,12 @@ function sanitizeFileName(fileName: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Check authentication
-    const { user } = await getCurrentUser();
-    if (!user) {
+    // 1. Create supabase client and check authentication
+    // Use a single client instance to ensure consistent auth context
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: "You must be signed in to upload PDFs" },
         { status: 401 }
@@ -81,8 +84,7 @@ export async function POST(request: NextRequest) {
     const sanitizedName = sanitizeFileName(file.name);
     const fileName = `${timestamp}-${sanitizedName}`;
 
-    // 6. Upload file to Supabase Storage
-    const supabase = await createClient();
+    // 6. Upload file to Supabase Storage (using same client)
     const { error: uploadError } = await supabase.storage
       .from("library")
       .upload(fileName, file, {

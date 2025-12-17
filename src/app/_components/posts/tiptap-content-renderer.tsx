@@ -19,64 +19,79 @@ interface TipTapContentRendererProps {
   content: string;
 }
 
+// Create custom extensions with unique names to avoid duplicate warnings
+// This is needed because Tiptap v3 may detect duplicates during HMR
+const CustomLink = Link.extend({
+  name: 'customLink',
+});
+
+const CustomUnderline = Underline.extend({
+  name: 'customUnderline',
+});
+
+// Define extensions outside component to prevent recreation on each render
+const extensions = [
+  StarterKit.configure({
+    // Explicitly configure to avoid any potential conflicts
+  }),
+  CustomUnderline,
+  CustomLink.configure({
+    openOnClick: true,
+    HTMLAttributes: {
+      class: "text-blue-600 underline dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300",
+    },
+  }),
+  Image.configure({
+    HTMLAttributes: {
+      class: "max-w-full h-auto rounded-lg my-4",
+    },
+  }),
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
+  }),
+  Table.configure({
+    resizable: true,
+    HTMLAttributes: {
+      class: "border-collapse table-auto w-full my-4",
+    },
+  }),
+  TableRow.configure({
+    HTMLAttributes: {
+      class: "border border-gray-300 dark:border-gray-600",
+    },
+  }),
+  TableHeader.configure({
+    HTMLAttributes: {
+      class: "border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-left font-semibold",
+    },
+  }),
+  TableCell.configure({
+    HTMLAttributes: {
+      class: "border border-gray-300 dark:border-gray-600 px-4 py-2",
+    },
+  }),
+  TaskList.configure({
+    HTMLAttributes: {
+      class: "list-none pl-0",
+    },
+  }),
+  TaskItem.configure({
+    nested: true,
+    HTMLAttributes: {
+      class: "flex items-start gap-2",
+    },
+  }),
+  Mathematics.configure({
+    katexOptions: {
+      throwOnError: false,
+    },
+  }),
+];
+
 export default function TipTapContentRenderer({ content }: TipTapContentRendererProps) {
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      Underline,
-      Link.configure({
-        openOnClick: true,
-        HTMLAttributes: {
-          class: "text-blue-600 underline dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300",
-        },
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: "max-w-full h-auto rounded-lg my-4",
-        },
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Table.configure({
-        resizable: true,
-        HTMLAttributes: {
-          class: "border-collapse table-auto w-full my-4",
-        },
-      }),
-      TableRow.configure({
-        HTMLAttributes: {
-          class: "border border-gray-300 dark:border-gray-600",
-        },
-      }),
-      TableHeader.configure({
-        HTMLAttributes: {
-          class: "border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-left font-semibold",
-        },
-      }),
-      TableCell.configure({
-        HTMLAttributes: {
-          class: "border border-gray-300 dark:border-gray-600 px-4 py-2",
-        },
-      }),
-      TaskList.configure({
-        HTMLAttributes: {
-          class: "list-none pl-0",
-        },
-      }),
-      TaskItem.configure({
-        nested: true,
-        HTMLAttributes: {
-          class: "flex items-start gap-2",
-        },
-      }),
-      Mathematics.configure({
-        katexOptions: {
-          throwOnError: false,
-        },
-      }),
-    ],
+    extensions,
     content,
     editable: false,
     editorProps: {
