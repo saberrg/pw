@@ -59,6 +59,16 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
+  // Protect /library routes - redirect to sign-in if not authenticated
+  const protectedPaths = ['/library'];
+  const isProtectedPath = protectedPaths.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  );
+
+  if (isProtectedPath && !session) {
+    return NextResponse.redirect(new URL('/gg', request.url));
+  }
+
   return response;
 }
 
