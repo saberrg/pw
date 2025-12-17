@@ -25,6 +25,15 @@ function sanitizeFileName(fileName: string): string {
     .toLowerCase();
 }
 
+/**
+ * DEPRECATED: This server action has issues with large files due to Next.js body size limits.
+ * The upload form now uses the signed URL flow via API routes instead:
+ * 1. POST /api/upload-pdf/get-signed-url - Get signed upload URL
+ * 2. PUT directly to Supabase Storage - Upload file
+ * 3. POST /api/upload-pdf/save-metadata - Save metadata
+ * 
+ * This function is kept for backwards compatibility with small files only.
+ */
 export async function uploadPdf(formData: FormData): Promise<UploadResult> {
   try {
     // 1. Check authentication
@@ -105,7 +114,16 @@ export async function uploadPdf(formData: FormData): Promise<UploadResult> {
     return { success: true, pdfId: pdfData.id };
   } catch (error) {
     console.error("Unexpected error during upload:", error);
-    return { success: false, error: "An unexpected error occurred" };
+    
+    // Provide more helpful error message for large file issues
+    let errorMessage = "An unexpected error occurred";
+    if (error instanceof Error) {
+      if (error.message.includes("body exceeded") || error.message.includes("Body is too large")) {
+        errorMessage = "File too large for server action. Use the upload dialog which handles large files.";
+      }
+    }
+    
+    return { success: false, error: errorMessage };
   }
 }
 

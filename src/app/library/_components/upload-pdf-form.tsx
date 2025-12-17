@@ -2,7 +2,6 @@
 
 import { useState, useRef, ChangeEvent, DragEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { uploadPdf } from "../actions";
 import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Textarea } from "@/app/_components/ui/textarea";
@@ -25,6 +24,7 @@ export function UploadPdfForm({ onSuccess, onCancel }: UploadPdfFormProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
@@ -96,40 +96,133 @@ export function UploadPdfForm({ onSuccess, onCancel }: UploadPdfFormProps) {
     }
 
     setIsUploading(true);
+    setUploadProgress(0);
 
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("title", title.trim());
-      formData.append("description", description.trim());
-      formData.append("thumbnail_url", thumbnailUrl.trim());
+      // Step 1: Get signed upload URL from our API
+      setUploadProgress(5);
+      const signedUrlResponse = await fetch("/api/upload-pdf/get-signed-url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: selectedFile.name,
+          fileSize: selectedFile.size,
+          contentType: selectedFile.type,
+        }),
+      });
 
-      const result = await uploadPdf(formData);
+      const signedUrlResult = await signedUrlResponse.json();
 
-      if (result.success) {
-        toast.success("PDF uploaded successfully!");
-        // Reset form
-        setSelectedFile(null);
-        setTitle("");
-        setDescription("");
-        setThumbnailUrl("");
-        setFileError(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
+      if (!signedUrlResult.success) {
+        toast.error(signedUrlResult.error || "Failed to get upload URL");
+        return;
+      }
+
+      // Step 2: Upload directly to Supabase Storage using signed URL
+      setUploadProgress(10);
+      
+      const uploadResponse = await uploadWithProgress(
+        signedUrlResult.signedUrl,
+        selectedFile,
+        (progress) => {
+          // Map progress from 10% to 80%
+          setUploadProgress(10 + Math.round(progress * 0.7));
         }
-        // Call success callback
-        if (onSuccess) {
-          onSuccess(result.pdfId);
-        }
-      } else {
-        toast.error(result.error);
+      );
+
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        console.error("Storage upload failed:", errorText);
+        toast.error("Failed to upload file to storage");
+        return;
+      }
+
+      // Step 3: Save metadata to database
+      setUploadProgress(85);
+      const metadataResponse = await fetch("/api/upload-pdf/save-metadata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          description: description.trim(),
+          thumbnailUrl: thumbnailUrl.trim(),
+          filePath: signedUrlResult.path,
+        }),
+      });
+
+      const metadataResult = await metadataResponse.json();
+
+      if (!metadataResult.success) {
+        toast.error(metadataResult.error || "Failed to save PDF metadata");
+        return;
+      }
+
+      setUploadProgress(100);
+      toast.success("PDF uploaded successfully!");
+
+      // Reset form
+      setSelectedFile(null);
+      setTitle("");
+      setDescription("");
+      setThumbnailUrl("");
+      setFileError(null);
+      setUploadProgress(0);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      // Call success callback
+      if (onSuccess) {
+        onSuccess(metadataResult.pdfId);
       }
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("An unexpected error occurred");
+      toast.error("An unexpected error occurred during upload");
     } finally {
       setIsUploading(false);
     }
+  };
+
+  // Upload file with progress tracking using XMLHttpRequest
+  const uploadWithProgress = (
+    url: string,
+    file: File,
+    onProgress: (progress: number) => void
+  ): Promise<Response> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          onProgress(progress);
+        }
+      });
+
+      xhr.addEventListener("load", () => {
+        // Create a Response-like object
+        resolve(new Response(xhr.responseText, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+        }));
+      });
+
+      xhr.addEventListener("error", () => {
+        reject(new Error("Upload failed"));
+      });
+
+      xhr.addEventListener("abort", () => {
+        reject(new Error("Upload aborted"));
+      });
+
+      xhr.open("PUT", url);
+      xhr.setRequestHeader("Content-Type", "application/pdf");
+      xhr.send(file);
+    });
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -275,6 +368,22 @@ export function UploadPdfForm({ onSuccess, onCancel }: UploadPdfFormProps) {
           Enter a URL for the PDF cover image
         </p>
       </div>
+
+      {/* Upload Progress */}
+      {isUploading && uploadProgress > 0 && (
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Uploading...</span>
+            <span>{uploadProgress}%</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-blue-500 h-full transition-all duration-300 ease-out"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Form Actions */}
       <div className="flex gap-3 justify-end">
