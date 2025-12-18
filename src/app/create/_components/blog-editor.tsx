@@ -115,7 +115,7 @@ export default function BlogEditor({ content, onChange }: BlogEditorProps) {
         class:
           "prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none focus:outline-none dark:prose-invert min-h-[500px] px-4 py-3",
       },
-      handlePaste: async (view, event) => {
+      handlePaste: (view, event) => {
         const items = event.clipboardData?.items;
         if (!items) return false;
 
@@ -129,21 +129,24 @@ export default function BlogEditor({ content, onChange }: BlogEditorProps) {
             const file = item.getAsFile();
             if (!file) return false;
 
+            // Handle async upload without blocking
             setUploading(true);
             
-            try {
-              const imageUrl = await uploadImageToSupabase(file);
-              
-              // Insert image at cursor position
-              editor.chain().focus().setImage({ src: imageUrl }).run();
-              
-              toast.success("Image pasted and uploaded!");
-            } catch (err: any) {
-              console.error("Upload error:", err);
-              toast.error(err.message || "Failed to upload image");
-            } finally {
-              setUploading(false);
-            }
+            uploadImageToSupabase(file)
+              .then((imageUrl) => {
+                // Insert image at cursor position
+                if (editor) {
+                  editor.chain().focus().setImage({ src: imageUrl }).run();
+                  toast.success("Image pasted and uploaded!");
+                }
+              })
+              .catch((err: any) => {
+                console.error("Upload error:", err);
+                toast.error(err.message || "Failed to upload image");
+              })
+              .finally(() => {
+                setUploading(false);
+              });
             
             return true; // Handled the paste event
           }
