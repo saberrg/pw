@@ -252,3 +252,7 @@ export function NoteCard({ note, isOwner, isAuthenticated, onDelete, onUpdate }:
     </>
   );
 }
+
+
+
+

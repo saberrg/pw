@@ -56,3 +56,7 @@ export function NotesList({ notes: initialNotes, currentUserId }: NotesListProps
     </div>
   );
 }
+
+
+
+

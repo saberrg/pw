@@ -98,3 +98,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
     </div>
   );
 }
+
+
+
+

@@ -60,8 +60,8 @@ export default async function PdfViewerPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <div className="border-b px-4 py-3">
+      {/* Header - Hidden on mobile (integrated into PDF viewer) */}
+      <div className="border-b px-4 py-3 hidden md:block">
         <div className="container mx-auto flex items-center gap-4">
           <Link href="/library">
             <Button variant="ghost" size="sm">

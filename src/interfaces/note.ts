@@ -20,3 +20,7 @@ export interface NoteWithAuthor extends Note {
 export interface NoteWithPdfAndAuthor extends NoteWithPdf {
   author_email?: string;
 }
+
+
+
+

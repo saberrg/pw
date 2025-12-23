@@ -27,3 +27,7 @@ interface PdfViewerWrapperProps {
 export function PdfViewerWrapper(props: PdfViewerWrapperProps) {
   return <PdfViewerClient {...props} />;
 }
+
+
+
+

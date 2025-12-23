@@ -62,3 +62,7 @@ export function SearchBar({ value, onChange, className }: SearchBarProps) {
     </div>
   );
 }
+
+
+
+
