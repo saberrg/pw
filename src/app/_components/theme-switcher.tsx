@@ -12,34 +12,21 @@ type ColorSchemePreference = "dark" | "light";
 const STORAGE_KEY = "nextjs-blog-starter-theme";
 const modes: ColorSchemePreference[] = ["dark", "light"];
 
-/** function to be injected in script tag for avoiding FOUC (Flash of Unstyled Content) */
-export const NoFOUCScript = (storageKey: string) => {
-  const [DARK, LIGHT] = ["dark", "light"];
-
-  /** Modify transition globally to avoid patched transitions */
-  const modifyTransition = () => {
-    const css = document.createElement("style");
+const themeScript = `
+  window.updateDOM = function () {
+    var css = document.createElement("style");
     css.textContent = "*,*:after,*:before{transition:none !important;}";
     document.head.appendChild(css);
 
-    return () => {
-      getComputedStyle(document.body);
-      setTimeout(() => document.head.removeChild(css), 1);
-    };
-  };
-
-  /** function to add remove dark class */
-  window.updateDOM = () => {
-    const restoreTransitions = modifyTransition();
-    const mode = localStorage.getItem(storageKey) ?? LIGHT;
-    const classList = document.documentElement.classList;
-    if (mode === DARK) classList.add(DARK);
-    else classList.remove(DARK);
+    var mode = localStorage.getItem(${JSON.stringify(STORAGE_KEY)}) || "light";
+    document.documentElement.classList.toggle("dark", mode === "dark");
     document.documentElement.setAttribute("data-mode", mode);
-    restoreTransitions();
+
+    getComputedStyle(document.body);
+    setTimeout(function () { document.head.removeChild(css); }, 1);
   };
   window.updateDOM();
-};
+`;
 
 let updateDOM: () => void;
 
@@ -140,7 +127,7 @@ const ThemeToggle = () => {
 const Script = memo(() => (
   <script
     dangerouslySetInnerHTML={{
-      __html: `(${NoFOUCScript.toString()})('${STORAGE_KEY}')`,
+      __html: themeScript,
     }}
   />
 ));
