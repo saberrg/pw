@@ -32,6 +32,8 @@ npm run build
 
 ## Cloudflare Workers
 
+Pushes to `master` deploy through `.github/workflows/cloudflare.yml`.
+
 Build and run the Worker locally with the production runtime.
 
 ```bash
