@@ -1,5 +1,4 @@
 import Container from "@/app/_components/container";
-import { EXAMPLE_PATH } from "@/lib/constants";
 import cn from "classnames";
 
 type Props = {
@@ -27,10 +26,7 @@ const Alert = ({ preview }: Props) => {
               </a>{" "}
               to exit preview mode.
             </>
-          ) : (
-            <>
-            </>
-          )}
+          ) : null}
         </div>
       </Container>
     </div>
