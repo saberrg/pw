@@ -25,7 +25,7 @@ interface PdfViewerClientProps {
 export function PdfViewerClient({ pdfId, pdfUrl, pdfTitle, initialPage, userId }: PdfViewerClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLDivElement>(null);
-  const hideTimerRef = useRef<NodeJS.Timeout>();
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
@@ -47,7 +47,7 @@ export function PdfViewerClient({ pdfId, pdfUrl, pdfTitle, initialPage, userId }
   const touchEndX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
   const touchEndY = useRef<number>(0);
-  const longPressTimerRef = useRef<NodeJS.Timeout>();
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const longPressTriggeredRef = useRef<boolean>(false);
 
   // Detect mobile and set container width
@@ -720,7 +720,6 @@ export function PdfViewerClient({ pdfId, pdfUrl, pdfTitle, initialPage, userId }
     </div>
   );
 }
-
 
 
 
